@@ -6,6 +6,10 @@
     "alquimia-angular": "",
     "html-minifier": ""
   },
+  "repository" : {
+    "type" : "git",
+    "url" : "https://github.com/AlquimiaWRG/alquimia-templates.git"
+  },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
