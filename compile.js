@@ -3,6 +3,10 @@
 module.exports = function(watchers) {
   var minifier = require('html-minifier');
   var fs = require('fs');
+  var appDir = alquimia.getPath('appDir');
+  var compiledScriptsDir = alquimia.getPath('compiledScriptsDir');
+  var viewsDir = alquimia.config.viewsDir || 'views';
+  var viewsFile = alquimia.config.viewsFile || 'templates';
 
   // https://github.com/kangax/html-minifier#options-quick-reference
   var options = {
@@ -12,13 +16,13 @@ module.exports = function(watchers) {
   var appName = alquimia.config.appName.camelCase;
 
   watchers.push({
-    watch: 'app/views/**/*.html',
-    notify: 'app/js/templates.js',
+    watch: appDir + '/' + viewsDir + '/**/*.html',
+    notify: appDir + '/' + compiledScriptsDir + '/' + viewsFile + '.js',
     compile: function(done) {
       var templateCacheScript = ["var module = angular.module('" + appName + "');"];
       templateCacheScript.push("module.run(['$templateCache', function($templateCache) {");
 
-      alquimia.traverse('app/views', function(file, isDirectory) {
+      alquimia.traverse(appDir + '/' + viewsDir, function(file, isDirectory) {
         if (!isDirectory) {
           var path = file.split('/').slice(1).join('/');
           var content = parse(minifier.minify(fs.readFileSync(file, 'utf-8'), options));
@@ -27,7 +31,7 @@ module.exports = function(watchers) {
       });
 
       templateCacheScript.push('}]);');
-      fs.writeFileSync('app/js/templates.js', templateCacheScript.join('\n'), 'utf8');
+      fs.writeFileSync(appDir + '/' + compiledScriptsDir + '/' + viewsFile + '.js', templateCacheScript.join('\n'), 'utf8');
       done();
     }
   });
